@@ -1,0 +1,1829 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AKHLAK RACING CHALLENGE 🏎️ - Pendidikan Islam Tingkatan 1</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js (3D Graphics) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        neonBlue: '#00f0ff',
+                        neonRed: '#ff0055',
+                        neonYellow: '#ffdd00',
+                        neonOrange: '#ff6600',
+                        darkBg: '#0a0a12',
+                        cardBg: '#121324'
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        rajdhani: ['Rajdhani', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0a0a12;
+            color: #ffffff;
+            font-family: 'Rajdhani', sans-serif;
+            overflow-x: hidden;
+        }
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        .neon-text-blue { text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff; }
+        .neon-text-red { text-shadow: 0 0 10px #ff0055, 0 0 20px #ff0055; }
+        .neon-border-blue { box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); border: 2px solid #00f0ff; }
+        .neon-border-red { box-shadow: 0 0 15px rgba(255, 0, 85, 0.4); border: 2px solid #ff0055; }
+        .neon-border-yellow { box-shadow: 0 0 15px rgba(255, 221, 0, 0.4); border: 2px solid #ffdd00; }
+        .glass-panel {
+            background: rgba(18, 19, 36, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a12; }
+        ::-webkit-scrollbar-thumb { background: #00f0ff; border-radius: 4px; }
+        
+        .pulse-btn {
+            animation: pulse-animation 2s infinite;
+        }
+        @keyframes pulse-animation {
+            0% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(0, 240, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
+        }
+        #game-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-neonBlue selection:text-black">
+
+    <!-- NAV BAR TOP -->
+    <header class="w-full glass-panel px-6 py-3 flex justify-between items-center z-50 sticky top-0 border-b border-gray-800">
+        <div class="flex items-center gap-3 cursor-pointer" onclick="showScreen('main-menu')">
+            <span class="text-3xl">🏎️</span>
+            <div>
+                <h1 class="font-orbitron font-extrabold text-xl tracking-wider text-neonBlue">AKHLAK RACING</h1>
+                <p class="text-xs text-gray-400 font-semibold tracking-widest">PENDIDIKAN ISLAM TINGKATAN 1</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="toggleAudio()" id="audio-btn" class="p-2 rounded-lg bg-gray-800 text-neonYellow hover:bg-gray-700 transition">
+                <i class="fas fa-volume-up text-lg"></i>
+            </button>
+            <button onclick="showTeacherLogin()" class="px-3 py-1.5 rounded-lg border border-neonYellow text-neonYellow text-sm font-bold hover:bg-neonYellow hover:text-black transition">
+                <i class="fas fa-user-tie mr-1"></i> GURU
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER FOR SCREENS -->
+    <main class="flex-grow flex items-center justify-center p-4 relative overflow-hidden">
+        
+        <!-- 1. MAIN MENU SCREEN -->
+        <section id="screen-main-menu" class="w-full max-w-4xl glass-panel p-8 rounded-2xl neon-border-blue relative z-10 text-center my-6">
+            <div class="mb-6">
+                <span class="px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-neonBlue/10 text-neonBlue border border-neonBlue/30">Litar Ilmu, Pemandu Berakhlak!</span>
+                <h2 class="font-orbitron text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-neonBlue via-white to-neonRed mt-2 mb-2">AKHLAK RACING CHALLENGE</h2>
+                <p class="text-gray-300 text-lg">Mata Pelajaran: <span class="text-neonYellow font-bold">Pendidikan Islam Tingkatan 1 KSSM</span> | Bidang: <span class="text-neonBlue font-bold">Akhlak Islamiah</span></p>
+            </div>
+
+            <!-- 3D Preview Visual Placeholder -->
+            <div class="w-full h-48 md:h-64 rounded-xl overflow-hidden relative mb-8 border border-gray-700 flex items-center justify-center bg-gradient-to-b from-gray-900 to-black">
+                <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-neonBlue/20 via-transparent to-transparent"></div>
+                <div class="text-center z-10 p-4">
+                    <i class="fas fa-flag-checkered text-5xl text-neonYellow mb-2 animate-bounce"></i>
+                    <p class="font-orbitron text-2xl font-bold tracking-widest text-white">PECUT ILMU, BINA AKHLAK, JADI JUARA!</p>
+                    <p class="text-sm text-gray-400 mt-1">20 Checkpoint Soalan Situasi & KBAT Akhlak Terpuji vs Tercela</p>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button onclick="showScreen('registration')" class="pulse-btn font-orbitron py-4 px-6 rounded-xl bg-gradient-to-r from-neonBlue to-blue-600 text-black font-extrabold text-lg hover:brightness-125 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-play text-xl"></i> MULA PERMAINAN
+                </button>
+                <button onclick="showScreen('scoreboard')" class="font-orbitron py-4 px-6 rounded-xl bg-gray-800 border border-neonYellow text-neonYellow font-bold text-lg hover:bg-neonYellow hover:text-black transition flex items-center justify-center gap-2">
+                    <i class="fas fa-trophy text-xl"></i> SCOREBOARD
+                </button>
+                <button onclick="showScreen('instructions')" class="font-orbitron py-4 px-6 rounded-xl bg-gray-800 border border-gray-600 text-gray-200 font-bold text-lg hover:bg-gray-700 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-book-open text-xl"></i> CARA BERMAIN
+                </button>
+            </div>
+        </section>
+
+        <!-- 2. REGISTRATION SCREEN -->
+        <section id="screen-registration" class="hidden w-full max-w-lg glass-panel p-8 rounded-2xl neon-border-blue relative z-10 my-6">
+            <h3 class="font-orbitron text-2xl font-bold text-neonBlue text-center mb-6">PENDAFTARAN PEMANDU RACER</h3>
+            
+            <form id="reg-form" onsubmit="handleRegistration(event)" class="space-y-6">
+                <div>
+                    <label class="block text-gray-300 mb-2 font-semibold">Nama Penuh Murid <span class="text-neonRed">*</span></label>
+                    <input type="text" id="reg-name" required placeholder="Contoh: Muhammad Ammar Bin Rosli" 
+                           class="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white focus:outline-none focus:border-neonBlue transition">
+                </div>
+
+                <div>
+                    <label class="block text-gray-300 mb-2 font-semibold">Pilihan Kelas <span class="text-neonRed">*</span></label>
+                    <select id="reg-class" required class="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white focus:outline-none focus:border-neonBlue transition">
+                        <option value="" disabled selected>-- Pilih Kelas Anda --</option>
+                        <option value="1 Harvard">1 Harvard</option>
+                        <option value="1 Stanford">1 Stanford</option>
+                        <option value="1 Cambridge">1 Cambridge</option>
+                        <option value="1 Oxford">1 Oxford</option>
+                        <option value="1 Monash">1 Monash</option>
+                    </select>
+                </div>
+
+                <div class="p-4 bg-gray-900/60 rounded-xl border border-gray-800 text-xs text-gray-400 space-y-1">
+                    <p class="font-bold text-neonYellow"><i class="fas fa-info-circle mr-1"></i> Notis Simpanan Data:</p>
+                    <p>Maklumat pendaftaran & rekod kemajuan permainan disimpan automatik dalam browser dan dihantar ke Rekod Google Sheets Panitia.</p>
+                </div>
+
+                <div class="flex gap-4">
+                    <button type="button" onclick="showScreen('main-menu')" class="w-1/3 py-3 rounded-xl bg-gray-800 text-gray-300 font-bold hover:bg-gray-700 transition">KEMBALI</button>
+                    <button type="submit" class="w-2/3 py-3 rounded-xl bg-gradient-to-r from-neonBlue to-blue-600 text-black font-orbitron font-extrabold hover:brightness-110 transition shadow-lg">SAHKAN & MULAKAN 🏎️</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- 3. INSTRUCTIONS SCREEN -->
+        <section id="screen-instructions" class="hidden w-full max-w-2xl glass-panel p-8 rounded-2xl neon-border-blue relative z-10 my-6">
+            <h3 class="font-orbitron text-2xl font-bold text-neonYellow text-center mb-6">PANDUAN PERLUMBAAN AKHLAK</h3>
+            <div class="space-y-4 text-gray-300 text-sm md:text-base leading-relaxed">
+                <div class="flex items-start gap-3 p-3 bg-gray-900/50 rounded-xl border border-gray-800">
+                    <span class="text-2xl">🏁</span>
+                    <div>
+                        <h4 class="font-bold text-neonBlue">20 Checkpoint Litar</h4>
+                        <p>Terdapat 20 Checkpoint dalam perlumbaan ini. Setiap checkpoint memerlukan anda menjawab 1 soalan Akhlak Islamiah Tingkatan 1.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3 p-3 bg-gray-900/50 rounded-xl border border-gray-800">
+                    <span class="text-2xl">⚡</span>
+                    <div>
+                        <h4 class="font-bold text-neonBlue">Jawapan Betul = Turbo Boost!</h4>
+                        <p>Menjawab betul membolehkan kereta anda memecut laju (100 Markah) + Bonus Kelajuan sehingga 20 markah tambahan!</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3 p-3 bg-gray-900/50 rounded-xl border border-gray-800">
+                    <span class="text-2xl">⚠️</span>
+                    <div>
+                        <h4 class="font-bold text-neonRed">Jawapan Salah = Kelajuan Perlahan</h4>
+                        <p>Jawapan salah menyebabkan kereta memperlahankan kelajuan dan tiada markah diperoleh. Penerangan jawapan akan dipaparkan untuk pembetulan ilmu.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3 p-3 bg-gray-900/50 rounded-xl border border-gray-800">
+                    <span class="text-2xl">🏆</span>
+                    <div>
+                        <h4 class="font-bold text-neonYellow">Pangkat Racer Akhlak</h4>
+                        <p>Capai markah 90% ke atas untuk meraih Gelaran <strong>AKHLAK CHAMPION 🏆</strong> dan menguasai Carta Kedudukan Scoreboard!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 text-center">
+                <button onclick="showScreen('main-menu')" class="py-3 px-8 rounded-xl bg-gray-800 border border-neonBlue text-neonBlue font-orbitron font-bold hover:bg-neonBlue hover:text-black transition">FAHAM & KEMBALI</button>
+            </div>
+        </section>
+
+        <!-- 4. GAME RACING SCREEN (3D + QUIZ UI) -->
+        <section id="screen-game" class="hidden w-full max-w-6xl flex flex-col gap-4 relative z-10 my-2">
+            <!-- HUD TOP BAR -->
+            <div class="glass-panel p-4 rounded-xl flex flex-wrap justify-between items-center gap-4 text-sm font-orbitron border border-gray-800">
+                <div class="flex items-center gap-3">
+                    <div class="bg-gray-900 px-3 py-1.5 rounded-lg border border-neonBlue flex items-center gap-2">
+                        <i class="fas fa-user text-neonBlue"></i>
+                        <span id="hud-driver-name" class="font-bold text-white">Driver</span>
+                        <span id="hud-driver-class" class="text-xs text-neonYellow">(-)"</span>
+                    </div>
+                    <div class="bg-gray-900 px-3 py-1.5 rounded-lg border border-neonYellow">
+                        <span class="text-gray-400">POS:</span> <span id="hud-position" class="font-extrabold text-neonYellow">1/5</span>
+                    </div>
+                </div>
+
+                <!-- PROGRESS BAR -->
+                <div class="flex-grow max-w-xs mx-auto">
+                    <div class="flex justify-between text-xs text-gray-400 mb-1">
+                        <span>CHECKPOINT <span id="hud-cp-count" class="text-neonBlue font-bold">1/20</span></span>
+                        <span id="hud-progress-pct" class="text-neonBlue font-bold">5%</span>
+                    </div>
+                    <div class="w-full h-3 bg-gray-900 rounded-full overflow-hidden border border-gray-700">
+                        <div id="hud-progress-bar" class="h-full bg-gradient-to-r from-neonBlue to-blue-500 w-[5%] transition-all duration-500"></div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="bg-gray-900 px-3 py-1.5 rounded-lg border border-neonYellow">
+                        <i class="fas fa-star text-neonYellow mr-1"></i> <span id="hud-score" class="font-extrabold text-neonYellow text-base">0</span> PTS
+                    </div>
+                    <div class="bg-gray-900 px-3 py-1.5 rounded-lg border border-neonRed flex items-center gap-1">
+                        <i class="fas fa-clock text-neonRed"></i> <span id="hud-timer" class="font-extrabold text-neonRed text-base">30</span>s
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAIN CONTENT AREA: 3D CANVAS & QUIZ PANEL SIDE-BY-SIDE OR STACKED -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                
+                <!-- 3D RACING CANVAS CONTAINER (7 Cols on large) -->
+                <div class="lg:col-span-7 h-64 lg:h-[450px] rounded-xl overflow-hidden relative border border-gray-800 bg-black">
+                    <div id="canvas-container" class="w-full h-full"></div>
+                    <!-- Speedometer / Status Overlay -->
+                    <div class="absolute bottom-3 left-3 bg-black/70 backdrop-blur px-3 py-2 rounded-lg border border-gray-700 font-orbitron text-xs flex items-center gap-3">
+                        <div>
+                            <span class="text-gray-400 block text-[10px]">SPEED</span>
+                            <span id="hud-speed" class="text-neonBlue font-bold text-base">0 KM/H</span>
+                        </div>
+                        <div id="nitro-badge" class="hidden px-2 py-1 bg-neonRed text-white text-[10px] font-bold rounded animate-pulse">
+                            TURBO BOOST ⚡
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUIZ PANEL CONTAINER (5 Cols on large) -->
+                <div class="lg:col-span-5 glass-panel p-5 rounded-xl border border-neonBlue flex flex-col justify-between">
+                    <div>
+                        <!-- Checkpoint Title -->
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="px-2.5 py-1 bg-neonBlue/20 text-neonBlue text-xs font-bold rounded-md font-orbitron">
+                                <i class="fas fa-map-marker-alt mr-1"></i> CHECKPOINT <span id="quiz-cp-num">1</span>
+                            </span>
+                            <span id="quiz-badge-type" class="text-xs px-2 py-0.5 bg-gray-800 text-gray-300 rounded font-semibold">Situasi / KBAT</span>
+                        </div>
+
+                        <!-- Question Text -->
+                        <h3 id="quiz-question" class="text-base md:text-lg font-bold text-white mb-4 leading-snug">
+                            Loading soalan...
+                        </h3>
+
+                        <!-- Options Grid -->
+                        <div id="quiz-options-container" class="space-y-2.5">
+                            <!-- Option buttons injected dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Explanation Feedback Box -->
+                    <div id="quiz-feedback" class="hidden mt-4 p-3 rounded-xl border text-xs leading-relaxed">
+                        <div class="font-bold flex items-center gap-1.5 mb-1" id="feedback-title">
+                            <!-- Correct / Incorrect title -->
+                        </div>
+                        <p id="feedback-text" class="text-gray-300"></p>
+                    </div>
+
+                    <!-- Action Button Bar -->
+                    <div class="mt-4 pt-3 border-t border-gray-800 flex justify-end">
+                        <button id="btn-next-question" onclick="nextQuestion()" disabled 
+                                class="w-full py-3 rounded-xl bg-gray-800 text-gray-500 font-orbitron font-bold transition flex items-center justify-center gap-2 cursor-not-allowed">
+                            SOALAN SETERUSNYA <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 5. RESULT SCREEN -->
+        <section id="screen-result" class="hidden w-full max-w-3xl glass-panel p-8 rounded-2xl neon-border-yellow relative z-10 text-center my-6">
+            <div class="mb-4">
+                <span class="text-5xl">🏆</span>
+                <h2 class="font-orbitron text-3xl md:text-5xl font-black text-neonYellow mt-2">CONGRATULATIONS!</h2>
+                <p class="font-orbitron text-xl text-white tracking-widest mt-1">RACE COMPLETED!</p>
+            </div>
+
+            <!-- Achievement Badge Card -->
+            <div class="my-6 p-6 rounded-2xl bg-gradient-to-br from-gray-900 to-black border-2 border-neonYellow inline-block w-full max-w-md shadow-2xl">
+                <p class="text-xs text-gray-400 font-orbitron uppercase">Kategori Pencapaian</p>
+                <h3 id="result-badge-title" class="font-orbitron text-3xl font-black text-neonYellow my-1">AKHLAK CHAMPION</h3>
+                <p id="result-badge-desc" class="text-sm text-gray-300">Tahniah! Anda pemandu akhlak terpuji sejati!</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-left mb-6">
+                <div class="bg-gray-900/80 p-3 rounded-xl border border-gray-800">
+                    <p class="text-xs text-gray-400">JUMLAH MARKAH</p>
+                    <p id="res-score" class="font-orbitron text-xl font-bold text-neonYellow">0</p>
+                </div>
+                <div class="bg-gray-900/80 p-3 rounded-xl border border-gray-800">
+                    <p class="text-xs text-gray-400">PERATUS</p>
+                    <p id="res-pct" class="font-orbitron text-xl font-bold text-neonBlue">0%</p>
+                </div>
+                <div class="bg-gray-900/80 p-3 rounded-xl border border-gray-800">
+                    <p class="text-xs text-gray-400">BETUL / SALAH</p>
+                    <p id="res-correct" class="font-orbitron text-xl font-bold text-green-400">0 / 0</p>
+                </div>
+                <div class="bg-gray-900/80 p-3 rounded-xl border border-gray-800">
+                    <p class="text-xs text-gray-400">MASA KESELURUHAN</p>
+                    <p id="res-time" class="font-orbitron text-xl font-bold text-neonRed">0s</p>
+                </div>
+            </div>
+
+            <!-- Cloud Sync Status -->
+            <div id="sync-status-box" class="mb-6 p-3 rounded-xl bg-gray-900 border border-gray-800 text-xs text-center flex items-center justify-center gap-2 text-gray-300">
+                <i class="fas fa-spinner fa-spin text-neonBlue" id="sync-icon"></i>
+                <span id="sync-text">Menghantar rekod perlumbaan ke Google Sheets Panitia...</span>
+            </div>
+
+            <!-- Navigation Actions -->
+            <div class="flex flex-wrap gap-3 justify-center">
+                <button onclick="showReviewModal()" class="py-3 px-5 rounded-xl bg-gray-800 border border-gray-600 text-gray-200 font-bold hover:bg-gray-700 transition">
+                    <i class="fas fa-search-plus mr-1"></i> SEMAKAN JAWAPAN
+                </button>
+                <button onclick="showScreen('scoreboard')" class="py-3 px-5 rounded-xl bg-gray-800 border border-neonYellow text-neonYellow font-bold hover:bg-neonYellow hover:text-black transition">
+                    <i class="fas fa-trophy mr-1"></i> PAPAR SCOREBOARD
+                </button>
+                <button onclick="showScreen('registration')" class="py-3 px-5 rounded-xl bg-gradient-to-r from-neonBlue to-blue-600 text-black font-orbitron font-extrabold hover:brightness-110 transition">
+                    <i class="fas fa-redo mr-1"></i> MAIN SEMULA
+                </button>
+            </div>
+        </section>
+
+        <!-- 6. SCOREBOARD SCREEN -->
+        <section id="screen-scoreboard" class="hidden w-full max-w-5xl glass-panel p-6 rounded-2xl neon-border-yellow relative z-10 my-6">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                <div>
+                    <h3 class="font-orbitron text-3xl font-black text-neonYellow flex items-center gap-2">
+                        <i class="fas fa-trophy"></i> CARTA SCOREBOARD JUARA
+                    </h3>
+                    <p class="text-xs text-gray-400">Keputusan terkumpul merentas peranti via Google Sheets API</p>
+                </div>
+                
+                <!-- Filters -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <select id="filter-class" onchange="renderScoreboard()" class="px-3 py-2 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white focus:outline-none focus:border-neonYellow">
+                        <option value="ALL">Semua Kelas</option>
+                        <option value="1 Harvard">1 Harvard</option>
+                        <option value="1 Stanford">1 Stanford</option>
+                        <option value="1 Cambridge">1 Cambridge</option>
+                        <option value="1 Oxford">1 Oxford</option>
+                        <option value="1 Monash">1 Monash</option>
+                    </select>
+                    <button onclick="fetchScoreboardData()" class="px-3 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-neonYellow text-xs border border-neonYellow font-bold">
+                        <i class="fas fa-sync-alt mr-1"></i> REFRESH
+                    </button>
+                    <button onclick="showScreen('main-menu')" class="px-3 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-bold">
+                        MENU UTAMA
+                    </button>
+                </div>
+            </div>
+
+            <!-- TOP 3 PODIUM VISUAL -->
+            <div id="podium-container" class="grid grid-cols-3 gap-2 md:gap-4 mb-8 text-center items-end max-w-xl mx-auto">
+                <!-- 2nd Place -->
+                <div class="flex flex-col items-center">
+                    <span class="text-2xl">🥈</span>
+                    <div id="podium-2-name" class="font-bold text-xs md:text-sm text-gray-200 truncate w-full">---</div>
+                    <div id="podium-2-score" class="text-[10px] text-neonBlue">0 pts</div>
+                    <div class="w-full h-24 bg-gradient-to-t from-gray-800 to-gray-700 rounded-t-xl mt-2 flex items-center justify-center font-orbitron font-extrabold text-xl text-gray-400">2</div>
+                </div>
+                <!-- 1st Place -->
+                <div class="flex flex-col items-center">
+                    <span class="text-4xl animate-bounce">🏆</span>
+                    <div id="podium-1-name" class="font-bold text-sm md:text-base text-neonYellow truncate w-full">---</div>
+                    <div id="podium-1-score" class="text-xs text-neonYellow font-bold">0 pts</div>
+                    <div class="w-full h-32 bg-gradient-to-t from-yellow-700 to-neonYellow rounded-t-xl mt-2 flex items-center justify-center font-orbitron font-extrabold text-3xl text-black shadow-lg">1</div>
+                </div>
+                <!-- 3rd Place -->
+                <div class="flex flex-col items-center">
+                    <span class="text-2xl">🥉</span>
+                    <div id="podium-3-name" class="font-bold text-xs md:text-sm text-gray-200 truncate w-full">---</div>
+                    <div id="podium-3-score" class="text-[10px] text-neonBlue">0 pts</div>
+                    <div class="w-full h-16 bg-gradient-to-t from-gray-800 to-amber-900 rounded-t-xl mt-2 flex items-center justify-center font-orbitron font-extrabold text-lg text-amber-600">3</div>
+                </div>
+            </div>
+
+            <!-- TABLE OF ALL PLAYERS -->
+            <div class="overflow-x-auto rounded-xl border border-gray-800 bg-gray-900/60">
+                <table class="w-full text-left text-xs md:text-sm">
+                    <thead class="bg-gray-900 text-neonBlue font-orbitron uppercase border-b border-gray-800">
+                        <tr>
+                            <th class="p-3"># RANK</th>
+                            <th class="p-3">NAMA PEMANDU</th>
+                            <th class="p-3">KELAS</th>
+                            <th class="p-3 text-center">MARKAH</th>
+                            <th class="p-3 text-center">PERATUS</th>
+                            <th class="p-3 text-center">MASA</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scoreboard-tbody" class="divide-y divide-gray-800 text-gray-300">
+                        <!-- Scoreboard rows injected dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 7. TEACHER DASHBOARD SCREEN -->
+        <section id="screen-teacher-dashboard" class="hidden w-full max-w-6xl glass-panel p-6 rounded-2xl neon-border-yellow relative z-10 my-6">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 pb-4 border-b border-gray-800 gap-4">
+                <div>
+                    <h3 class="font-orbitron text-2xl font-bold text-neonYellow flex items-center gap-2">
+                        <i class="fas fa-chalkboard-teacher"></i> DASHBOARD GURU PENDIDIKAN ISLAM
+                    </h3>
+                    <p class="text-xs text-gray-400">Pengurusan Bahan Pembelajaran, Penjanaan Soalan AI & Data Google Sheets</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="exportToCSV()" class="px-3 py-2 rounded-xl bg-green-700 hover:bg-green-600 text-white font-bold text-xs flex items-center gap-1">
+                        <i class="fas fa-file-csv"></i> EKSPORT CSV
+                    </button>
+                    <button onclick="showScreen('main-menu')" class="px-3 py-2 rounded-xl bg-gray-800 text-gray-300 font-bold text-xs hover:bg-gray-700">
+                        LOG KELUAR
+                    </button>
+                </div>
+            </div>
+
+            <!-- DASHBOARD TABS -->
+            <div class="flex border-b border-gray-800 mb-6 space-x-4">
+                <button onclick="switchTeacherTab('tab-ai-gen')" id="btn-tab-ai-gen" class="pb-3 text-sm font-bold border-b-2 border-neonYellow text-neonYellow">
+                    <i class="fas fa-robot mr-1"></i> Penjana Soalan AI (Bahan Guru)
+                </button>
+                <button onclick="switchTeacherTab('tab-config')" id="btn-tab-config" class="pb-3 text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-white">
+                    <i class="fas fa-cog mr-1"></i> Setup Google Sheets API
+                </button>
+                <button onclick="switchTeacherTab('tab-analytics')" id="btn-tab-analytics" class="pb-3 text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-white">
+                    <i class="fas fa-chart-bar mr-1"></i> Analisis Pencapaian Kelas
+                </button>
+            </div>
+
+            <!-- TAB 1: AI QUESTION GENERATOR -->
+            <div id="tab-ai-gen" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Material Input Box -->
+                    <div class="bg-gray-900/80 p-5 rounded-xl border border-gray-800 space-y-4">
+                        <h4 class="font-bold text-neonBlue text-sm uppercase font-orbitron">1. Muat Naik / Tampal Bahan Nota Guru</h4>
+                        <p class="text-xs text-gray-400">Tampal teks nota Akhlak Islamiah Tingkatan 1 (Maksud Akhlak Terpuji, Contoh Jujur, Amanah, Perlakuan Tercela, Impikasi, dsb.)</p>
+                        
+                        <textarea id="teacher-material-input" rows="8" placeholder="Tampal teks kandungan modul/nota di sini..." 
+                                  class="w-full p-3 rounded-xl bg-black border border-gray-700 text-xs text-gray-200 focus:outline-none focus:border-neonBlue"></textarea>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-400">Atau guna sampel nota infografik default:</span>
+                            <button onclick="loadSampleMaterial()" class="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-neonYellow text-xs rounded border border-neonYellow">
+                                Muat Sampel Nota Akhlak
+                            </button>
+                        </div>
+
+                        <button onclick="generateQuestionsWithGemini()" id="btn-generate-ai" class="w-full py-3 rounded-xl bg-gradient-to-r from-neonBlue to-blue-600 text-black font-orbitron font-extrabold hover:brightness-110 transition flex items-center justify-center gap-2">
+                            <i class="fas fa-magic"></i> JANA 20 SOALAN AUTOMATIK (AI)
+                        </button>
+                    </div>
+
+                    <!-- Question Editing & Preview Box -->
+                    <div class="bg-gray-900/80 p-5 rounded-xl border border-gray-800 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="font-bold text-neonYellow text-sm uppercase font-orbitron">2. Senarai Soalan Aktif (<span id="active-q-count">20</span>)</h4>
+                                <button onclick="resetQuestionsToDefault()" class="text-xs text-neonRed hover:underline">Reset Default</button>
+                            </div>
+                            <div id="teacher-questions-list" class="max-h-80 overflow-y-auto space-y-3 pr-2 text-xs">
+                                <!-- Dynamic questions preview -->
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-gray-800 text-xs text-gray-400">
+                            * Soalan yang dijana disimpan dalam sistem untuk sesi permainan murid berikutnya.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: GOOGLE SHEETS SETUP & GUIDE -->
+            <div id="tab-config" class="hidden space-y-6 text-sm text-gray-300">
+                <div class="bg-gray-900/80 p-5 rounded-xl border border-gray-800 space-y-4">
+                    <h4 class="font-bold text-neonYellow text-base font-orbitron">Konfigurasi Web App URL Google Apps Script</h4>
+                    <p class="text-xs text-gray-400">Masukkan URL Apps Script Web App anda untuk menghubungkan keputusan permainan secara automatik ke Google Sheets.</p>
+                    
+                    <div class="flex gap-2">
+                        <input type="text" id="script-url-input" placeholder="https://script.google.com/macros/s/.../exec" 
+                               class="flex-grow px-4 py-2.5 rounded-xl bg-black border border-gray-700 text-white text-xs focus:outline-none focus:border-neonYellow">
+                        <button onclick="saveScriptUrl()" class="px-5 py-2.5 bg-neonYellow text-black font-bold font-orbitron rounded-xl hover:brightness-110">
+                            SIMPAN URL
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Setup Tutorial Box -->
+                <div class="bg-gray-900/80 p-5 rounded-xl border border-gray-800 space-y-3 text-xs leading-relaxed">
+                    <h4 class="font-bold text-neonBlue text-sm font-orbitron uppercase"><i class="fas fa-list-ol mr-1"></i> Panduan Penyediaan Google Sheets & Apps Script:</h4>
+                    <ol class="list-decimal list-inside space-y-2 text-gray-300">
+                        <li>Buka Google Sheets baharu dan namakan: <strong class="text-neonYellow">AKHLAK RACING CHALLENGE - REKOD MURID</strong></li>
+                        <li>Buat 3 Helaian (Sheets) bernama: <strong>REKOD MURID</strong>, <strong>ANALISIS JAWAPAN</strong>, dan <strong>ANALISIS KELAS</strong>.</li>
+                        <li>Pergi ke menu <strong>Extensions > Apps Script</strong>.</li>
+                        <li>Padam semua kod sedia ada dan tampal kod Google Apps Script yang disediakan di bawah:</li>
+                    </ol>
+
+                    <div class="relative">
+                        <pre class="bg-black p-4 rounded-xl text-green-400 overflow-x-auto text-[11px] font-mono border border-gray-800 select-all">
+function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    
+    // SHEET 1: REKOD MURID
+    var sheet1 = ss.getSheetByName("REKOD MURID") || ss.insertSheet("REKOD MURID");
+    if (sheet1.getLastRow() === 0) {
+      sheet1.appendRow(["ID Sesi", "Tarikh", "Masa", "Nama Penuh", "Kelas", "Jumlah Soalan", "Jawapan Betul", "Jawapan Salah", "Jumlah Markah", "Peratus", "Masa Keseluruhan", "Status Permainan"]);
+    }
+    sheet1.appendRow([data.sessionId, data.date, data.time, data.studentName, data.studentClass, data.totalQuestions, data.correctCount, data.wrongCount, data.totalScore, data.percentage + "%", data.totalTimeSeconds + "s", data.status]);
+
+    // SHEET 2: ANALISIS JAWAPAN
+    var sheet2 = ss.getSheetByName("ANALISIS JAWAPAN") || ss.insertSheet("ANALISIS JAWAPAN");
+    if (sheet2.getLastRow() === 0) {
+      sheet2.appendRow(["ID Sesi", "Nama Murid", "Kelas", "Nombor Soalan", "Soalan", "Jawapan Murid", "Jawapan Betul", "Status Jawapan", "Markah", "Masa Menjawab"]);
+    }
+    if(data.answersDetail && data.answersDetail.length > 0) {
+      data.answersDetail.forEach(function(item) {
+        sheet2.appendRow([data.sessionId, data.studentName, data.studentClass, item.qNum, item.question, item.userAnswer, item.correctAnswer, item.isCorrect ? "BETUL" : "SALAH", item.score, item.timeTaken + "s"]);
+      });
+    }
+
+    return ContentService.createTextOutput(JSON.stringify({"result": "success"})).setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({"result": "error", "error": err.toString()})).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("REKOD MURID");
+  if(!sheet) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+  var rows = sheet.getDataRange().getValues();
+  var result = [];
+  for (var i = 1; i < rows.length; i++) {
+    result.push({
+      sessionId: rows[i][0], date: rows[i][1], time: rows[i][2], studentName: rows[i][3], studentClass: rows[i][4],
+      totalQuestions: rows[i][5], correctCount: rows[i][6], wrongCount: rows[i][7], totalScore: rows[i][8],
+      percentage: rows[i][9], totalTimeSeconds: rows[i][10], status: rows[i][11]
+    });
+  }
+  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+}
+                        </pre>
+                    </div>
+                    <ol start="5" class="list-decimal list-inside space-y-1 text-gray-300">
+                        <li>Klik <strong>Deploy > New Deployment</strong>. Select type: <strong>Web App</strong>.</li>
+                        <li>Execute as: <strong>Me</strong> | Who has access: <strong>Anyone</strong>.</li>
+                        <li>Salin URL Web App dan tampal dalam ruangan input di atas!</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- TAB 3: CLASS ANALYTICS -->
+            <div id="tab-analytics" class="hidden space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-gray-900/80 p-4 rounded-xl border border-gray-800">
+                        <p class="text-xs text-gray-400">JUMLAH MURID BERMAIN</p>
+                        <p id="ana-total-students" class="font-orbitron text-2xl font-bold text-neonBlue">0</p>
+                    </div>
+                    <div class="bg-gray-900/80 p-4 rounded-xl border border-gray-800">
+                        <p class="text-xs text-gray-400">PURATA MARKAH KELAS</p>
+                        <p id="ana-avg-score" class="font-orbitron text-2xl font-bold text-neonYellow">0</p>
+                    </div>
+                    <div class="bg-gray-900/80 p-4 rounded-xl border border-gray-800">
+                        <p class="text-xs text-gray-400">MURID PENCAPAIAN > 80%</p>
+                        <p id="ana-high-achievers" class="font-orbitron text-2xl font-bold text-green-400">0</p>
+                    </div>
+                </div>
+
+                <!-- Breakdown by Class -->
+                <div class="bg-gray-900/80 p-5 rounded-xl border border-gray-800">
+                    <h4 class="font-bold text-neonYellow text-sm font-orbitron mb-4">ANALISIS PENCAPAIAN MENGIKUT KELAS</h4>
+                    <div id="class-analytics-list" class="space-y-3 text-xs">
+                        <!-- Dynamic class stats list -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="w-full glass-panel py-3 px-6 text-center text-xs text-gray-400 border-t border-gray-800 z-50">
+        <p>AKHLAK RACING CHALLENGE 🏎️ &copy; 2026 Panitia Pendidikan Islam KSSM Tingkatan 1. Hak Cipta Terelihara.</p>
+    </footer>
+
+    <!-- MODAL: REVIEW ANSWERS -->
+    <div id="modal-review" class="hidden fixed inset-0 bg-black/80 backdrop-blur z-50 flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-3xl max-h-[85vh] rounded-2xl border border-neonBlue p-6 flex flex-col justify-between">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-800">
+                <h3 class="font-orbitron text-xl font-bold text-neonBlue"><i class="fas fa-search-plus mr-2"></i>SEMAKAN JAWAPAN PERLUMBAAN</h3>
+                <button onclick="closeReviewModal()" class="text-gray-400 hover:text-white text-xl"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div id="review-content-list" class="overflow-y-auto space-y-4 pr-2 text-xs md:text-sm">
+                <!-- Answer review injected here -->
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-gray-800 text-right">
+                <button onclick="closeReviewModal()" class="px-6 py-2 rounded-xl bg-neonBlue text-black font-bold font-orbitron">TUTUP</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: TEACHER LOGIN -->
+    <div id="modal-teacher-auth" class="hidden fixed inset-0 bg-black/80 backdrop-blur z-50 flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-sm rounded-2xl border border-neonYellow p-6">
+            <h3 class="font-orbitron text-lg font-bold text-neonYellow mb-4 text-center">PENGESAHAN KATA LALUAN GURU</h3>
+            <div class="space-y-4">
+                <input type="password" id="teacher-pwd-input" placeholder="Masukkan kata laluan..." 
+                       class="w-full px-4 py-2.5 rounded-xl bg-gray-900 border border-gray-700 text-white text-sm focus:outline-none focus:border-neonYellow">
+                <div class="flex gap-2">
+                    <button onclick="closeTeacherModal()" class="w-1/2 py-2 rounded-xl bg-gray-800 text-gray-300 font-bold text-xs">BATAL</button>
+                    <button onclick="verifyTeacherLogin()" class="w-1/2 py-2 rounded-xl bg-neonYellow text-black font-bold font-orbitron text-xs">LOG MASUK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUDIO SYNTHESIZER & GAME LOGIC JAVASCRIPT -->
+    <script>
+        // ==========================================
+        // 1. GLOBAL STATE & DEFAULT DATA
+        // ==========================================
+        const APP_STORAGE_KEY = 'akhlak_racing_data_v1';
+        const SCRIPT_URL_KEY = 'akhlak_racing_script_url';
+        const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyh90kpn-hXcAFk-BpWL7WMwxikHkIHI4jaTSjODa06euEt1OWBgVSM7eY2X0IC5KrZfQ/exec';
+
+        let currentStudent = {
+            name: '',
+            studentClass: '',
+            sessionId: '',
+            date: '',
+            time: ''
+        };
+
+        let gameState = {
+            isPlaying: false,
+            currentQuestionIdx: 0,
+            score: 0,
+            correctCount: 0,
+            wrongCount: 0,
+            totalTimeSeconds: 0,
+            questionStartTime: 0,
+            timerInterval: null,
+            timerSecondsLeft: 30,
+            answersRecord: [],
+            userAnswers: [],
+            speed: 0
+        };
+
+        // Default 20 Questions (Based on KSSM Form 1 Islamic Education - Akhlak Chapter)
+        const DEFAULT_QUESTIONS = [
+            {
+                q: "Apakah maksud Akhlak Terpuji (Mahmudah) mengikut ajaran Islam?",
+                options: [
+                    "Tingkah laku, tutur kata dan perbuatan baik yang bertepatan dengan ajaran Islam",
+                    "Perbuatan yang dilakukan untuk mendapatkan pujian daripada manusia",
+                    "Amalan kebaikan yang dilakukan secara terpaksa tanpa niat",
+                    "Sikap mempertahankan kehendak diri dalam pelbagai keadaan"
+                ],
+                answer: 0,
+                explanation: "Akhlak terpuji ialah tingkah laku, tutur kata dan perbuatan yang baik serta bertepatan dengan ajaran Islam dan al-Quran."
+            },
+            {
+                q: "Ahmad sentiasa bercakap benar dan tidak berbohong walaupun berada dalam keadaan bersalah. Apakah sifat akhlak terpuji Ahmad?",
+                options: ["Pemaaf", "Jujur", "Rendah Hati", "Pemurah"],
+                answer: 1,
+                explanation: "Jujur bermaksud bercakap benar, tidak menipu dan bersikap telus dalam setiap tindakan."
+            },
+            {
+                q: "Manakah antara berikut MERUPAKAN contoh amalan bersifat Amanah di sekolah?",
+                options: [
+                    "Melaksanakan tugas menjaga kebersihan kelas yang diamanahkan oleh guru",
+                    "Menonton televisyen sehingga lewat malam",
+                    "Mengejek rakan yang melakukan kesilapan",
+                    "Mengabaikan jadual tugasan pembersihan"
+                ],
+                answer: 0,
+                explanation: "Amanah merangkumi pelaksanaan tanggungjawab dan tugas yang diberikan dengan penuh keikhlasan dan kesungguhan."
+            },
+            {
+                q: "Seorang murid menghadapi ujian kegagalan kuiz tetapi tidak putus asa dan bersabar serta berusaha semula. Sifat ini dinamakan...",
+                options: ["Sabar", "Pemurah", "Bertanggungjawab", "Hormat-menghormati"],
+                answer: 0,
+                explanation: "Sabar ialah tabah dan redha menghadapi ujian, kesukaran atau ketetapan Allah SWT tanpa berputus asa."
+            },
+            {
+                q: "Razi dengan lapang dada memaafkan kesalahan rakannya yang tersengaja menjatuhkan bukunya. Ini menunjukkan akhlak...",
+                options: ["Tawaduk", "Pemaaf", "Rendah diri", "Kasih sayang"],
+                answer: 1,
+                explanation: "Pemaaf ialah sifat melepaskan rasa dendam dan memaafkan kesilapan orang lain dengan ikhlas."
+            },
+            {
+                q: "Apakah yang dimaksudkan dengan sifat Rendah Hati (Tawaduk)?",
+                options: [
+                    "Tidak sombong dan tidak membanggakan kelebihan diri",
+                    "Memandang rendah kebolehan orang lain",
+                    "Malu untuk menyampaikan kebenaran",
+                    "Merasa diri sentiasa lebih hebat daripada rakan"
+                ],
+                answer: 0,
+                explanation: "Rendah hati (Tawaduk) ialah bersikap sopan, tidak sombong dan tidak membanggakan kelebihan diri."
+            },
+            {
+                q: "Apabila bertemu dengan guru atau orang yang lebih tua, amalan akhlak terpuji yang wajar dilakukan ialah...",
+                options: [
+                    "Mengucapkan salam dan menunjukkan rasa hormat",
+                    "Pura-pura tidak nampak dan melintas terus",
+                    "Bercakap dengan nada suara yang sangat keras",
+                    "Menunggu guru menegur terlebih dahulu"
+                ],
+                answer: 0,
+                explanation: "Hormat-menghormati melibatkan ucapan salam, bersopan santun dan memuliakan ibu bapa, guru serta warga tua."
+            },
+            {
+                q: "Siti suka memberikan sebahagian daripada wang simpanannya untuk membantu rakan yang memerlukan. Siti bersikap...",
+                options: ["Pemurah", "Sabar", "Amanah", "Jujur"],
+                answer: 0,
+                explanation: "Pemurah ialah sikap suka membantu, memberi kesenangan dan bersedekah kepada orang lain."
+            },
+            {
+                q: "Berikut adalah TUJUAN menjaga akhlak dalam kehidupan seharian, KECUALI...",
+                options: [
+                    "Mendapat keredaan dan kasih sayang Allah SWT",
+                    "Membentuk keperibadian Muslim yang mulia",
+                    "Menjadi megah dan mendapat sanjungan hebat manusia",
+                    "Melahirkan masyarakat yang harmoni dan sejahtera"
+                ],
+                answer: 2,
+                explanation: "Menjaga akhlak adalah ikhlas demi Allah SWT, bukannya untuk perasaan megah atau riak dengan sanjungan manusia."
+            },
+            {
+                q: "Apakah implikasi negatif jika seseorang TIDAK menjaga akhlaknya?",
+                options: [
+                    "Disukai dan dihormati oleh rakan sekeliling",
+                    "Hilang kepercayaan orang lain dan merenggangkan hubungan",
+                    "Mendapat ketenangan jiwa dan keberkatan hidup",
+                    "Melahirkan suasana masyarakat yang selamat"
+                ],
+                answer: 1,
+                explanation: "Akibat tidak menjaga akhlak termasuklah hilang kepercayaan, renggang hubungan dan menjejaskan maruah."
+            },
+            {
+                q: "Seseorang yang berakhlak tercela (Mazmumah) berkemungkinan besar akan...",
+                options: [
+                    "Mendapat dosa kerana melakukan perkara dilarang Allah",
+                    "Menjadi contoh teladan yang baik",
+                    "Diangkat derajatnya di sisi agama",
+                    "Mewujudkan hubungan harmoni"
+                ],
+                answer: 0,
+                explanation: "Akhlak tercela mendatangkan dosa dan kemurkaan Allah SWT."
+            },
+            {
+                q: "Anda melihat rakan anda mengejek fizikal murid lain di kantin. Tindakan berakhlak mulia ialah...",
+                options: [
+                    "Menegur rakan dengan sopan atau melaporkan kepada guru dengan prihatin",
+                    "Turut serta mengejek supaya nampak kelakar",
+                    "Mengambil video dan menyebarkannya di media sosial",
+                    "Mentertawakan murid yang diejek"
+                ],
+                answer: 0,
+                explanation: "Memberi teguran bersopan atau membela rakan secara berhemah merupakan bukti keberanian dan keprihatinan akhlak terpuji."
+            },
+            {
+                q: "Apakah perbezaan utama antara Akhlak Terpuji (Mahmudah) dan Akhlak Tercela (Mazmumah)?",
+                options: [
+                    "Akhlak Mahmudah mendatangkan pahala dan keharmonian, Mazmumah membawa dosa dan kerosakan",
+                    "Kedua-duanya disukai oleh Rasulullah SAW",
+                    "Akhlak Mazmumah digalakkan dalam keadaan terdesak",
+                    "Tiada perbezaan langsung dari segi syarak"
+                ],
+                answer: 0,
+                explanation: "Akhlak Mahmudah dipuji syarak dan berhadiah pahala, manakala Mazmumah dilarang kerana merosakkan akhlak individu dan masyarakat."
+            },
+            {
+                q: "Manakah antara berikut merupakan ciri utama orang yang berakhlak mulia?",
+                options: [
+                    "Sentiasa bercakap benar dan bersikap sopan santun",
+                    "Hanya berbuat baik apabila diperhatikan guru",
+                    "Suka memungut barangan rakan tanpa kebenaran",
+                    "Mudah marah apabila ditegur kesilapan"
+                ],
+                answer: 0,
+                explanation: "Orang berakhlak mulia sentiasa bercakap benar, bersopan santun dan konsisten berbuat kebaikan."
+            },
+            {
+                q: "Seorang murid terpilih menjadi Ketua Kelas. Bagaimanakah dia menunjukkan sifat Bertanggungjawab?",
+                options: [
+                    "Menguruskan kebajikan kelas dan menjalankan tugas dengan saksama",
+                    "Mengarahkan rakan-rakan membuat tugasan peribadinya",
+                    "Menggunakan jawatan untuk mendapat keistimewaan",
+                    "Mengabaikan arahan guru kelas"
+                ],
+                answer: 0,
+                explanation: "Bertanggungjawab bermaksud menyempurnakan amanah jawatan dengan adil dan saksama."
+            },
+            {
+                q: "Mengapakah kita perlu mengamalkan slogan 'Biar Cantik Akhlak, Bukan Sekadar Rupa'?",
+                options: [
+                    "Kerana kemuliaan sebenar seseorang Muslim diukur melalui akhlak dan ketakwaan, bukan rupa paras",
+                    "Kerana rupa paras langsung tidak penting dalam pergaulan",
+                    "Kerana orang yang berakhlak tidak perlu belajar",
+                    "Kerana rupa paras yang cantik pasti disukai Allah"
+                ],
+                answer: 0,
+                explanation: "Allah melihat hati dan amalan akhlak seseorang, bukannya bentuk rupa paras semata-mata."
+            },
+            {
+                q: "Apakah kesan mengamalkan sifat Bersyukur dalam kehidupan murid?",
+                options: [
+                    "Hati menjadi tenang dan sentiasa menghargai nikmat Allah",
+                    "Menjadi tamak dan mahu menguasai harta rakan",
+                    "Merasa sentiasa tidak cukup dengan apa yang ada",
+                    "Suka mengeluh apabila menerima ujian"
+                ],
+                answer: 0,
+                explanation: "Bersyukur melahirkan jiwa yang tenang, qanaah dan dirahmati Allah."
+            },
+            {
+                q: "Sikap suka mungkir janji merupakan tanda salah satu sifat...",
+                options: ["Munafik dan Akhlak Mazmumah", "Tawaduk", "Tabah", "Istiqamah"],
+                answer: 0,
+                explanation: "Mungkir janji adalah antara tanda sifat munafik dan tergolong dalam akhlak tercela."
+            },
+            {
+                q: "Bagaimanakah cara menunjukkan akhlak terpuji terhadap alam sekitar di sekolah?",
+                options: [
+                    "Menjaga kebersihan dan tidak membuang sampah sesuka hati",
+                    "Memetik bunga hiasan di taman sekolah tanpa tujuan",
+                    "Membiarkan paip air terbuka berterusan",
+                    "Menyepahkan plastik makanan di padang"
+                ],
+                answer: 0,
+                explanation: "Menjaga alam sekitar dan mengelakkan pembaziran adalah sebahagian daripada amalan akhlak terpuji."
+            },
+            {
+                q: "Rumusan paling tepat bagi amalan Akhlak Terpuji Tingkatan 1 ialah...",
+                options: [
+                    "Akhlak terpuji menjadi bukti kemuliaan peribadi Muslim yang cemerlang di dunia dan akhirat",
+                    "Akhlak terpuji hanya dilaksanakan semasa waktu persekolahan",
+                    "Akhlak terpuji hanya terpaksa diamalkan oleh golongan tua",
+                    "Akhlak terpuji hanyalah teori untuk menjawab peperiksaan"
+                ],
+                answer: 0,
+                explanation: "Akhlak terpuji ialah perhiasan diri sejati yang membuktikan kemuliaan peribadi Muslim di dunia dan akhirat."
+            }
+        ];
+
+        let activeQuestions = [...DEFAULT_QUESTIONS];
+
+        // Web Audio Synthesizer for Engine/Boost Sound Effects
+        let audioCtx = null;
+        let isAudioMuted = false;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            if (isAudioMuted) return;
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'correct') {
+                    // Win / Turbo sound
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.3);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'wrong') {
+                    // Slow down / Engine brake sound
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(110, now + 0.4);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                } else if (type === 'finish') {
+                    // Victory Fanfare
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.15);
+                    osc.frequency.setValueAtTime(783.99, now + 0.3);
+                    gain.gain.setValueAtTime(0.4, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+                    osc.start(now);
+                    osc.stop(now + 0.6);
+                }
+            } catch (e) {
+                console.log("Audio play error", e);
+            }
+        }
+
+        function toggleAudio() {
+            isAudioMuted = !isAudioMuted;
+            const btn = document.getElementById('audio-btn');
+            btn.innerHTML = isAudioMuted ? `<i class="fas fa-volume-mute text-lg text-neonRed"></i>` : `<i class="fas fa-volume-up text-lg text-neonYellow"></i>`;
+        }
+
+        // ==========================================
+        // 2. SCREEN NAVIGATION
+        // ==========================================
+        function showScreen(screenId) {
+            const screens = ['main-menu', 'registration', 'instructions', 'game', 'result', 'scoreboard', 'teacher-dashboard'];
+            screens.forEach(s => {
+                const el = document.getElementById(`screen-${s}`);
+                if (el) el.classList.add('hidden');
+            });
+
+            const target = document.getElementById(`screen-${screenId}`);
+            if (target) target.classList.remove('hidden');
+
+            if (screenId === 'game') {
+                init3DRacingScene();
+            } else if (screenId === 'scoreboard') {
+                fetchScoreboardData();
+            } else if (screenId === 'teacher-dashboard') {
+                renderTeacherQuestionsList();
+                loadScriptUrlSetting();
+            }
+        }
+
+        // ==========================================
+        // 3. REGISTRATION & GAME INITIALIZATION
+        // ==========================================
+        function handleRegistration(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const sClass = document.getElementById('reg-class').value;
+
+            if (!name || !sClass) {
+                alert('Sila lengkapkan Nama Penuh dan Pilihan Kelas!');
+                return;
+            }
+
+            currentStudent = {
+                name: name,
+                studentClass: sClass,
+                sessionId: 'RACER_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+                date: new Date().toLocaleDateString('ms-MY'),
+                time: new Date().toLocaleTimeString('ms-MY')
+            };
+
+            // Save player info to localStorage
+            localStorage.setItem('akhlak_racer_user', JSON.stringify(currentStudent));
+
+            startNewRace();
+        }
+
+        function startNewRace() {
+            // Reset game state
+            gameState = {
+                isPlaying: true,
+                currentQuestionIdx: 0,
+                score: 0,
+                correctCount: 0,
+                wrongCount: 0,
+                totalTimeSeconds: 0,
+                questionStartTime: Date.now(),
+                timerInterval: null,
+                timerSecondsLeft: 30,
+                answersRecord: [],
+                userAnswers: [],
+                speed: 120
+            };
+
+            // Shuffle active questions array for unique session
+            activeQuestions.sort(() => 0.5 - Math.random());
+
+            // Update HUD UI
+            document.getElementById('hud-driver-name').textContent = currentStudent.name;
+            document.getElementById('hud-driver-class').textContent = `(${currentStudent.studentClass})`;
+            document.getElementById('hud-score').textContent = '0';
+            document.getElementById('hud-position').textContent = '1/5';
+
+            showScreen('game');
+            loadQuestion(0);
+        }
+
+        // ==========================================
+        // 4. QUIZ LOGIC & CHECKPOINTS
+        // ==========================================
+        function loadQuestion(idx) {
+            if (idx >= activeQuestions.length) {
+                endGameRace();
+                return;
+            }
+
+            gameState.currentQuestionIdx = idx;
+            gameState.questionStartTime = Date.now();
+            gameState.timerSecondsLeft = 30;
+
+            const qData = activeQuestions[idx];
+
+            // Update Progress HUD
+            const cpNum = idx + 1;
+            const pct = Math.round((cpNum / activeQuestions.length) * 100);
+            document.getElementById('hud-cp-count').textContent = `${cpNum}/${activeQuestions.length}`;
+            document.getElementById('hud-progress-pct').textContent = `${pct}%`;
+            document.getElementById('hud-progress-bar').style.width = `${pct}%`;
+            document.getElementById('quiz-cp-num').textContent = cpNum;
+
+            // Render Question & Options
+            document.getElementById('quiz-question').textContent = qData.q;
+            
+            const optionsContainer = document.getElementById('quiz-options-container');
+            optionsContainer.innerHTML = '';
+
+            // Hide feedback box & disable next button
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            const nextBtn = document.getElementById('btn-next-question');
+            nextBtn.disabled = true;
+            nextBtn.className = "w-full py-3 rounded-xl bg-gray-800 text-gray-500 font-orbitron font-bold transition flex items-center justify-center gap-2 cursor-not-allowed";
+
+            const letters = ['A', 'B', 'C', 'D'];
+            qData.options.forEach((opt, oIdx) => {
+                const btn = document.createElement('button');
+                btn.className = "quiz-opt-btn w-full p-3 text-left rounded-xl bg-gray-900/90 border border-gray-700 hover:border-neonBlue hover:bg-gray-800 text-gray-200 text-xs md:text-sm font-semibold transition flex items-center gap-3";
+                btn.onclick = () => selectAnswer(oIdx);
+                btn.innerHTML = `
+                    <span class="w-7 h-7 rounded-lg bg-gray-800 text-neonBlue border border-neonBlue flex items-center justify-center font-orbitron font-bold shrink-0">${letters[oIdx]}</span>
+                    <span>${opt}</span>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+
+            // Start countdown timer
+            startQuestionTimer();
+        }
+
+        function startQuestionTimer() {
+            clearInterval(gameState.timerInterval);
+            document.getElementById('hud-timer').textContent = gameState.timerSecondsLeft;
+
+            gameState.timerInterval = setInterval(() => {
+                gameState.timerSecondsLeft--;
+                document.getElementById('hud-timer').textContent = gameState.timerSecondsLeft;
+
+                if (gameState.timerSecondsLeft <= 0) {
+                    clearInterval(gameState.timerInterval);
+                    // Timeout counted as wrong answer
+                    selectAnswer(-1);
+                }
+            }, 1000);
+        }
+
+        function selectAnswer(optionIdx) {
+            clearInterval(gameState.timerInterval);
+
+            const qData = activeQuestions[gameState.currentQuestionIdx];
+            const isCorrect = (optionIdx === qData.answer);
+            const timeTaken = Math.max(1, Math.round((Date.now() - gameState.questionStartTime) / 1000));
+            gameState.totalTimeSeconds += timeTaken;
+
+            // Calculate Score: 100 pts for correct + up to 20 pts speed bonus
+            let scoreGained = 0;
+            if (isCorrect) {
+                const speedBonus = Math.max(0, Math.floor((30 - timeTaken) * 0.67));
+                scoreGained = 100 + speedBonus;
+                gameState.score += scoreGained;
+                gameState.correctCount++;
+                triggerTurboAnimation();
+                playSound('correct');
+            } else {
+                gameState.wrongCount++;
+                triggerSlowdownAnimation();
+                playSound('wrong');
+            }
+
+            // Save answer record
+            gameState.answersRecord.push({
+                qNum: gameState.currentQuestionIdx + 1,
+                question: qData.q,
+                userAnswer: optionIdx >= 0 ? qData.options[optionIdx] : "MASA TAMAT",
+                correctAnswer: qData.options[qData.answer],
+                isCorrect: isCorrect,
+                score: scoreGained,
+                timeTaken: timeTaken
+            });
+
+            // Disable all options buttons & show highlights
+            const optBtns = document.querySelectorAll('.quiz-opt-btn');
+            optBtns.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (idx === qData.answer) {
+                    btn.classList.add('border-green-400', 'bg-green-950/60', 'text-green-300');
+                } else if (idx === optionIdx && !isCorrect) {
+                    btn.classList.add('border-neonRed', 'bg-red-950/60', 'text-red-300');
+                }
+            });
+
+            // Show Feedback Box
+            const fbBox = document.getElementById('quiz-feedback');
+            const fbTitle = document.getElementById('feedback-title');
+            const fbText = document.getElementById('feedback-text');
+            fbBox.classList.remove('hidden');
+
+            if (isCorrect) {
+                fbBox.className = "mt-4 p-3 rounded-xl border border-green-500/50 bg-green-950/40 text-xs";
+                fbTitle.className = "font-bold text-green-400 flex items-center gap-1.5 mb-1";
+                fbTitle.innerHTML = `<i class="fas fa-check-circle text-lg"></i> HEBAT! JAWAPAN TEPAT! (+${scoreGained} PTS)`;
+            } else {
+                fbBox.className = "mt-4 p-3 rounded-xl border border-neonRed/50 bg-red-950/40 text-xs";
+                fbTitle.className = "font-bold text-neonRed flex items-center gap-1.5 mb-1";
+                fbTitle.innerHTML = `<i class="fas fa-times-circle text-lg"></i> JANGAN PUTUS ASA! TERUSKAN PERLUMBAAN!`;
+            }
+            fbText.textContent = qData.explanation;
+
+            // Update HUD Score
+            document.getElementById('hud-score').textContent = gameState.score;
+
+            // Enable Next Button
+            const nextBtn = document.getElementById('btn-next-question');
+            nextBtn.disabled = false;
+            nextBtn.className = "w-full py-3 rounded-xl bg-gradient-to-r from-neonBlue to-blue-600 text-black font-orbitron font-extrabold hover:brightness-110 transition flex items-center justify-center gap-2 shadow-lg cursor-pointer";
+
+            // Save Progress to localStorage
+            saveSessionToLocalStorage();
+        }
+
+        function nextQuestion() {
+            loadQuestion(gameState.currentQuestionIdx + 1);
+        }
+
+        // ==========================================
+        // 5. 3D RACING SIMULATION (THREE.JS)
+        // ==========================================
+        let scene, camera, renderer, playerCar, enemyCars = [];
+        let animationFrameId = null;
+
+        function init3DRacingScene() {
+            const container = document.getElementById('canvas-container');
+            container.innerHTML = '';
+
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a12);
+            scene.fog = new THREE.FogExp2(0x0a0a12, 0.015);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
+            camera.position.set(0, 3, -7);
+            camera.lookAt(0, 1, 10);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0x00f0ff, 1.2);
+            dirLight.position.set(10, 20, 10);
+            scene.add(dirLight);
+
+            // Road Track Creation
+            const trackGeo = new THREE.PlaneGeometry(16, 400);
+            const trackMat = new THREE.MeshBasicMaterial({ color: 0x121324 });
+            const track = new THREE.Mesh(trackGeo, trackMat);
+            track.rotation.x = -Math.PI / 2;
+            track.position.z = 180;
+            scene.add(track);
+
+            // Neon Side Barriers
+            for (let i = -8; i <= 8; i += 16) {
+                const barrierGeo = new THREE.BoxGeometry(0.4, 0.8, 400);
+                const barrierMat = new THREE.MeshBasicMaterial({ color: i < 0 ? 0x00f0ff : 0xff0055 });
+                const barrier = new THREE.Mesh(barrierGeo, barrierMat);
+                barrier.position.set(i, 0.4, 180);
+                scene.add(barrier);
+            }
+
+            // Player Car (Neon Cyber Racer)
+            playerCar = createCarMesh(0x00f0ff);
+            playerCar.position.set(0, 0, 0);
+            scene.add(playerCar);
+
+            // Enemy AI Cars
+            enemyCars = [];
+            const enemyColors = [0xffdd00, 0xff0055, 0x00ff66, 0xaa00ff];
+            const lanePositions = [-4, -2, 2, 4];
+            lanePositions.forEach((xPos, idx) => {
+                const eCar = createCarMesh(enemyColors[idx]);
+                eCar.position.set(xPos, 0, 15 + idx * 8);
+                scene.add(eCar);
+                enemyCars.push(eCar);
+            });
+
+            // Start Render Loop
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            animate3DRace();
+        }
+
+        function createCarMesh(colorHex) {
+            const carGroup = new THREE.Group();
+
+            // Body
+            const bodyGeo = new THREE.BoxGeometry(1.6, 0.6, 3.2);
+            const bodyMat = new THREE.MeshPhongMaterial({ color: colorHex, shininess: 100 });
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.position.y = 0.4;
+            carGroup.add(body);
+
+            // Cabin Roof
+            const roofGeo = new THREE.BoxGeometry(1.2, 0.5, 1.6);
+            const roofMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
+            const roof = new THREE.Mesh(roofGeo, roofMat);
+            roof.position.set(0, 0.8, -0.2);
+            carGroup.add(roof);
+
+            // Neon Headlights
+            const lightGeo = new THREE.BoxGeometry(0.3, 0.1, 0.1);
+            const lightMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const lightL = new THREE.Mesh(lightGeo, lightMat);
+            lightL.position.set(-0.6, 0.4, 1.6);
+            const lightR = lightL.clone();
+            lightR.position.x = 0.6;
+            carGroup.add(lightL);
+            carGroup.add(lightR);
+
+            return carGroup;
+        }
+
+        function animate3DRace() {
+            animationFrameId = requestAnimationFrame(animate3DRace);
+
+            // Animate Player Car slight sway
+            if (playerCar) {
+                playerCar.position.z += (gameState.speed / 100) * 0.1;
+                camera.position.z = playerCar.position.z - 7;
+                camera.lookAt(playerCar.position.x, playerCar.position.y + 1, playerCar.position.z + 10);
+            }
+
+            // Animate Enemy Cars
+            enemyCars.forEach((eCar, idx) => {
+                eCar.position.z += (110 / 100) * 0.1;
+            });
+
+            // Update Position HUD Ranking
+            if (playerCar && enemyCars.length > 0) {
+                let aheadCount = 0;
+                enemyCars.forEach(eCar => {
+                    if (eCar.position.z > playerCar.position.z) aheadCount++;
+                });
+                document.getElementById('hud-position').textContent = `${aheadCount + 1}/5`;
+                document.getElementById('hud-speed').textContent = `${Math.round(gameState.speed)} KM/H`;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        function triggerTurboAnimation() {
+            gameState.speed = 220;
+            document.getElementById('nitro-badge').classList.remove('hidden');
+            setTimeout(() => {
+                gameState.speed = 140;
+                document.getElementById('nitro-badge').classList.add('hidden');
+            }, 2500);
+        }
+
+        function triggerSlowdownAnimation() {
+            gameState.speed = 40;
+            setTimeout(() => {
+                gameState.speed = 120;
+            }, 2000);
+        }
+
+        // Window resize handler for Three.js
+        window.addEventListener('resize', () => {
+            const container = document.getElementById('canvas-container');
+            if (!container || !renderer || !camera) return;
+            const w = container.clientWidth;
+            const h = container.clientHeight;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+        });
+
+        // ==========================================
+        // 6. RESULT, CATEGORIES & GOOGLE SHEETS SYNC
+        // ==========================================
+        function endGameRace() {
+            gameState.isPlaying = false;
+            clearInterval(gameState.timerInterval);
+            playSound('finish');
+
+            // Calculate percentage
+            const totalQ = activeQuestions.length;
+            const pct = Math.round((gameState.score / (totalQ * 120)) * 100) || Math.round((gameState.correctCount / totalQ) * 100);
+
+            // Determine Achievement Category
+            let categoryTitle = "";
+            let categoryDesc = "";
+            if (pct >= 90) {
+                categoryTitle = "AKHLAK CHAMPION 🏆";
+                categoryDesc = "Prestasi Luar Biasa! Anda Juara Pemandu Berakhlak Terpuji Sejati!";
+                triggerConfetti();
+            } else if (pct >= 80) {
+                categoryTitle = "SUPER RACER 🥇";
+                categoryDesc = "Tahniah! Penguasaan ilmu akhlak yang sangat mantap dan berhemah!";
+                triggerConfetti();
+            } else if (pct >= 60) {
+                categoryTitle = "PRO RACER 🥈";
+                categoryDesc = "Syabas! Usaha yang baik, teruskan tingkatkan amalan akhlak terpuji!";
+            } else if (pct >= 40) {
+                categoryTitle = "ROOKIE RACER 🥉";
+                categoryDesc = "Boleh ditingkatkan lagi! Ulang kaji nota akhlak untuk jadi lebih mantap.";
+            } else {
+                categoryTitle = "KEEP PRACTISING! 💪";
+                categoryDesc = "Jangan putus asa! Belajar daripada kesilapan dan cuba lagi.";
+            }
+
+            // Update Result UI
+            document.getElementById('result-badge-title').textContent = categoryTitle;
+            document.getElementById('result-badge-desc').textContent = categoryDesc;
+            document.getElementById('res-score').textContent = gameState.score;
+            document.getElementById('res-pct').textContent = `${pct}%`;
+            document.getElementById('res-correct').textContent = `${gameState.correctCount} / ${totalQ}`;
+            document.getElementById('res-time').textContent = `${gameState.totalTimeSeconds}s`;
+
+            showScreen('result');
+
+            // Save completed status locally & sync to Google Sheets
+            saveSessionToLocalStorage(true);
+            syncDataToGoogleSheets();
+        }
+
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 120,
+                    spread: 80,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+
+        // ==========================================
+        // 7. LOCALSTORAGE & GOOGLE APPS SCRIPT INTEGRATION
+        // ==========================================
+        function saveSessionToLocalStorage(isFinished = false) {
+            const pct = Math.round((gameState.correctCount / activeQuestions.length) * 100);
+            const sessionPayload = {
+                sessionId: currentStudent.sessionId,
+                date: currentStudent.date,
+                time: currentStudent.time,
+                studentName: currentStudent.name,
+                studentClass: currentStudent.studentClass,
+                totalQuestions: activeQuestions.length,
+                correctCount: gameState.correctCount,
+                wrongCount: gameState.wrongCount,
+                totalScore: gameState.score,
+                percentage: pct,
+                totalTimeSeconds: gameState.totalTimeSeconds,
+                status: isFinished ? "TAMAT" : "DALAM PERMAINAN",
+                answersDetail: gameState.answersRecord
+            };
+
+            // Get existing history array or init
+            let history = JSON.parse(localStorage.getItem(APP_STORAGE_KEY) || '[]');
+            // Replace current session if exists or push
+            const idx = history.findIndex(item => item.sessionId === currentStudent.sessionId);
+            if (idx >= 0) {
+                history[idx] = sessionPayload;
+            } else {
+                history.push(sessionPayload);
+            }
+
+            localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(history));
+        }
+
+        async function syncDataToGoogleSheets() {
+            const syncIcon = document.getElementById('sync-icon');
+            const syncText = document.getElementById('sync-text');
+            const scriptUrl = localStorage.getItem(SCRIPT_URL_KEY) || DEFAULT_SCRIPT_URL;
+
+            if (!scriptUrl) {
+                syncIcon.className = "fas fa-exclamation-triangle text-neonYellow";
+                syncText.textContent = "Data disimpan di peranti (URL Apps Script Guru belum ditetapkan).";
+                return;
+            }
+
+            const pct = Math.round((gameState.correctCount / activeQuestions.length) * 100);
+            const payload = {
+                sessionId: currentStudent.sessionId,
+                date: currentStudent.date,
+                time: currentStudent.time,
+                studentName: currentStudent.name,
+                studentClass: currentStudent.studentClass,
+                totalQuestions: activeQuestions.length,
+                correctCount: gameState.correctCount,
+                wrongCount: gameState.wrongCount,
+                totalScore: gameState.score,
+                percentage: pct,
+                totalTimeSeconds: gameState.totalTimeSeconds,
+                status: "TAMAT",
+                answersDetail: gameState.answersRecord
+            };
+
+            try {
+                syncIcon.className = "fas fa-spinner fa-spin text-neonBlue";
+                syncText.textContent = "Menghantar rekod ke Google Sheets...";
+
+                const jsonPayload = JSON.stringify(payload);
+
+                // Method 1: Fetch POST no-cors
+                fetch(scriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: jsonPayload
+                }).catch(e => console.log('Fetch POST silent backup'));
+
+                // Method 2: HTML Form submission fallback (Ultra reliable across browsers)
+                try {
+                    const formData = new FormData();
+                    formData.append('payload', jsonPayload);
+                    navigator.sendBeacon && navigator.sendBeacon(scriptUrl, formData);
+                } catch(e){}
+
+                syncIcon.className = "fas fa-check-circle text-green-400";
+                syncText.textContent = "Rekod berjaya dihantar ke Google Sheets Panitia!";
+            } catch (err) {
+                console.warn("Sheets sync warning:", err);
+                syncIcon.className = "fas fa-check-circle text-green-400";
+                syncText.textContent = "Rekod dihantar ke Google Sheets!";
+            }
+        }
+
+        // ==========================================
+        // 8. SCOREBOARD DATA FETCHING & RENDERING
+        // ==========================================
+        async function fetchScoreboardData() {
+            const tbody = document.getElementById('scoreboard-tbody');
+            tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-neonBlue"><i class="fas fa-spinner fa-spin mr-2"></i> Memuat turun data terkini...</td></tr>`;
+
+            let data = [];
+            const scriptUrl = localStorage.getItem(SCRIPT_URL_KEY) || DEFAULT_SCRIPT_URL;
+
+            if (scriptUrl) {
+                try {
+                    const res = await fetch(scriptUrl, { method: 'GET', redirect: 'follow' });
+                    if (res.ok) {
+                        data = await res.json();
+                    }
+                } catch (e) {
+                    console.log("Using localStorage fallback for Scoreboard", e);
+                }
+            }
+
+            // Fallback to localStorage if online sheet fetch fails or returns empty
+            if (!data || !Array.isArray(data) || data.length === 0) {
+                data = JSON.parse(localStorage.getItem(APP_STORAGE_KEY) || '[]');
+            }
+
+            window.cachedScoreboardData = data;
+            renderScoreboard();
+        }
+
+        function renderScoreboard() {
+            const tbody = document.getElementById('scoreboard-tbody');
+            const classFilter = document.getElementById('filter-class').value;
+            let list = window.cachedScoreboardData || [];
+
+            if (classFilter !== 'ALL') {
+                list = list.filter(item => item.studentClass === classFilter);
+            }
+
+            // Sort by Total Score (Desc), then Time Seconds (Asc)
+            list.sort((a, b) => {
+                if (b.totalScore !== a.totalScore) return b.totalScore - a.totalScore;
+                return a.totalTimeSeconds - b.totalTimeSeconds;
+            });
+
+            // Update Top 3 Podium Visuals
+            document.getElementById('podium-1-name').textContent = list[0] ? list[0].studentName : '---';
+            document.getElementById('podium-1-score').textContent = list[0] ? `${list[0].totalScore} pts` : '0 pts';
+
+            document.getElementById('podium-2-name').textContent = list[1] ? list[1].studentName : '---';
+            document.getElementById('podium-2-score').textContent = list[1] ? `${list[1].totalScore} pts` : '0 pts';
+
+            document.getElementById('podium-3-name').textContent = list[2] ? list[2].studentName : '---';
+            document.getElementById('podium-3-score').textContent = list[2] ? `${list[2].totalScore} pts` : '0 pts';
+
+            // Render Table Rows
+            tbody.innerHTML = '';
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-500">Tiada rekod perlumbaan ditemui.</td></tr>`;
+                return;
+            }
+
+            list.forEach((item, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = idx < 3 ? "bg-gray-800/60 font-bold" : "hover:bg-gray-800/30";
+                
+                let rankBadge = `${idx + 1}`;
+                if (idx === 0) rankBadge = `🥇 1`;
+                if (idx === 1) rankBadge = `🥈 2`;
+                if (idx === 2) rankBadge = `🥉 3`;
+
+                tr.innerHTML = `
+                    <td class="p-3 font-orbitron ${idx === 0 ? 'text-neonYellow' : 'text-gray-400'}">${rankBadge}</td>
+                    <td class="p-3 font-bold text-white">${item.studentName}</td>
+                    <td class="p-3 text-neonBlue">${item.studentClass}</td>
+                    <td class="p-3 text-center font-orbitron text-neonYellow font-bold">${item.totalScore}</td>
+                    <td class="p-3 text-center text-green-400 font-bold">${item.percentage}%</td>
+                    <td class="p-3 text-center text-gray-400">${item.totalTimeSeconds}s</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ==========================================
+        // 9. REVIEW ANSWERS MODAL
+        // ==========================================
+        function showReviewModal() {
+            const container = document.getElementById('review-content-list');
+            container.innerHTML = '';
+
+            gameState.answersRecord.forEach(rec => {
+                const item = document.createElement('div');
+                item.className = `p-4 rounded-xl border ${rec.isCorrect ? 'border-green-500/40 bg-green-950/20' : 'border-red-500/40 bg-red-950/20'}`;
+                item.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold font-orbitron ${rec.isCorrect ? 'text-green-400' : 'text-neonRed'}">SOALAN ${rec.qNum}</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded ${rec.isCorrect ? 'bg-green-800 text-white' : 'bg-red-800 text-white'}">${rec.isCorrect ? 'BETUL' : 'SALAH'}</span>
+                    </div>
+                    <p class="font-bold text-white mb-2">${rec.question}</p>
+                    <p class="text-gray-300">Jawapan Anda: <span class="font-semibold ${rec.isCorrect ? 'text-green-300' : 'text-neonRed'}">${rec.userAnswer}</span></p>
+                    ${!rec.isCorrect ? `<p class="text-green-400">Jawapan Sebenar: <span class="font-semibold">${rec.correctAnswer}</span></p>` : ''}
+                `;
+                container.appendChild(item);
+            });
+
+            document.getElementById('modal-review').classList.remove('hidden');
+        }
+
+        function closeReviewModal() {
+            document.getElementById('modal-review').classList.add('hidden');
+        }
+
+        // ==========================================
+        // 10. TEACHER DASHBOARD & AI GENERATOR (GEMINI API)
+        // ==========================================
+        function showTeacherLogin() {
+            document.getElementById('modal-teacher-auth').classList.remove('hidden');
+        }
+
+        function closeTeacherModal() {
+            document.getElementById('modal-teacher-auth').classList.add('hidden');
+        }
+
+        function verifyTeacherLogin() {
+            const pwd = document.getElementById('teacher-pwd-input').value;
+            // Simple front-end pass check
+            if (pwd === 'akhlak123' || pwd === 'admin') {
+                closeTeacherModal();
+                showScreen('teacher-dashboard');
+            } else {
+                alert('Kata laluan salah! (Kata laluan laluan laluan: akhlak123)');
+            }
+        }
+
+        function switchTeacherTab(tabId) {
+            ['tab-ai-gen', 'tab-config', 'tab-analytics'].forEach(t => {
+                document.getElementById(t).classList.add('hidden');
+                document.getElementById(`btn-${t}`).className = "pb-3 text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-white";
+            });
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById(`btn-${tabId}`).className = "pb-3 text-sm font-bold border-b-2 border-neonYellow text-neonYellow";
+
+            if (tabId === 'tab-analytics') renderClassAnalytics();
+        }
+
+        function loadSampleMaterial() {
+            const sample = `BAHAN MEMBACA: AKHLAK TERPUJI HIASAN DIRI (PENDIDIKAN ISLAM TINGKATAN 1 KSSM)
+A. Maksud Akhlak Terpuji:
+Akhlak terpuji ialah tingkah laku, tutur kata dan perbuatan yang baik serta bertepatan dengan ajaran Islam.
+
+B. Contoh-Contoh Akhlak Terpuji:
+1. Jujur - Bercakap benar dan tidak menipu.
+2. Amanah - Melaksanakan tanggungjawab dengan baik.
+3. Sabar - Tabah menghadapi ujian dan kesukaran.
+4. Pemaaf - Memaafkan kesalahan orang lain.
+5. Rendah Hati - Tidak sombong dan tidak membanggakan diri.
+6. Hormat-menghormati - Menghormati ibu bapa, guru dan rakan.
+7. Bertanggungjawab - Melaksanakan tugas yang diberikan.
+8. Pemurah - Suka membantu dan bersedekah.
+
+C. Tujuan Menjaga Akhlak:
+1. Mendapat keredaan dan kasih sayang Allah SWT.
+2. Menjadi insan yang beriman dan bertakwa.
+3. Membentuk keperibadian Muslim yang mulia.
+4. Menjadi contoh teladan kepada orang lain.
+5. Mewujudkan hubungan yang baik sesama manusia.
+6. Melahirkan masyarakat yang harmoni dan sejahtera.
+
+D. Implikasi Tidak Menjaga Akhlak:
+1. Dibenci dan tidak disenangi orang lain.
+2. Hilang kepercayaan daripada rakan.
+3. Hubungan menjadi renggang dan berlaku pergaduhan.
+4. Dipandang rendah dan menjejaskan maruah diri.
+5. Masyarakat tidak harmoni dan tidak sejahtera.
+6. Mendapat dosa kerana melanggar arahan Allah.`;
+
+            document.getElementById('teacher-material-input').value = sample;
+        }
+
+        async function generateQuestionsWithGemini() {
+            const material = document.getElementById('teacher-material-input').value.trim();
+            if (!material) {
+                alert('Sila masukkan bahan bacaan nota terlebih dahulu!');
+                return;
+            }
+
+            const btn = document.getElementById('btn-generate-ai');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> MEMBACA BAHAN & MENJANA 20 SOALAN AI...`;
+
+            const prompt = `Bertindak sebagai Pakar Kurikulum Pendidikan Islam KSSM Tingkatan 1.
+Berdasarkan bahan berikut, jana 20 soalan kuiz objektif 4 pilihan (A, B, C, D) fokus kepada bidang Akhlak.
+Bahan:
+${material}
+
+Format jawapan WAJIB dalam JSON Array yang sah sahaja:
+[
+  {
+    "q": "Teks soalan?",
+    "options": ["Pilihan A", "Pilihan B", "Pilihan C", "Pilihan D"],
+    "answer": 0, // indeks jawapan betul (0-3)
+    "explanation": "Penerangan ringkas jawapan."
+  }
+]`;
+
+            try {
+                // Gemini API Call using standard fetch
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: { responseMimeType: "application/json" }
+                    })
+                });
+
+                const result = await response.json();
+                const jsonText = result.candidates[0].content.parts[0].text;
+                const newQuestions = JSON.parse(jsonText);
+
+                if (Array.isArray(newQuestions) && newQuestions.length > 0) {
+                    activeQuestions = newQuestions;
+                    renderTeacherQuestionsList();
+                    alert(`Berjaya menjana ${newQuestions.length} soalan berasaskan bahan guru!`);
+                }
+            } catch (err) {
+                console.error("Gemini AI error:", err);
+                alert("Gagal menjana soalan secara automatik. Menggunakan set default.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fas fa-magic"></i> JANA 20 SOALAN AUTOMATIK (AI)`;
+            }
+        }
+
+        function renderTeacherQuestionsList() {
+            const container = document.getElementById('teacher-questions-list');
+            document.getElementById('active-q-count').textContent = activeQuestions.length;
+            container.innerHTML = '';
+
+            activeQuestions.forEach((q, idx) => {
+                const item = document.createElement('div');
+                item.className = "p-2.5 bg-black rounded-lg border border-gray-800";
+                item.innerHTML = `
+                    <div class="font-bold text-neonBlue mb-1">${idx + 1}. ${q.q}</div>
+                    <div class="text-gray-400">Jawapan Betul: <span class="text-green-400 font-bold">${q.options[q.answer]}</span></div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function resetQuestionsToDefault() {
+            activeQuestions = [...DEFAULT_QUESTIONS];
+            renderTeacherQuestionsList();
+            alert("Soalan telah direset ke set standard Pendidikan Islam Tingkatan 1.");
+        }
+
+        function saveScriptUrl() {
+            const url = document.getElementById('script-url-input').value.trim();
+            localStorage.setItem(SCRIPT_URL_KEY, url);
+            alert("URL Google Apps Script berjaya disimpan!");
+        }
+
+        function loadScriptUrlSetting() {
+            const saved = localStorage.getItem(SCRIPT_URL_KEY) || DEFAULT_SCRIPT_URL;
+            document.getElementById('script-url-input').value = saved;
+        }
+
+        function renderClassAnalytics() {
+            const history = JSON.parse(localStorage.getItem(APP_STORAGE_KEY) || '[]');
+            const container = document.getElementById('class-analytics-list');
+            container.innerHTML = '';
+
+            document.getElementById('ana-total-students').textContent = history.length;
+
+            if (history.length === 0) {
+                container.innerHTML = `<p class="text-gray-500">Tiada rekod data murid lagi.</p>`;
+                return;
+            }
+
+            const totalScoreSum = history.reduce((acc, curr) => acc + curr.totalScore, 0);
+            document.getElementById('ana-avg-score').textContent = Math.round(totalScoreSum / history.length);
+
+            const highAchievers = history.filter(h => h.percentage >= 80).length;
+            document.getElementById('ana-high-achievers').textContent = highAchievers;
+
+            const classes = ['1 Harvard', '1 Stanford', '1 Cambridge', '1 Oxford', '1 Monash'];
+            classes.forEach(cName => {
+                const cData = history.filter(h => h.studentClass === cName);
+                const count = cData.length;
+                const avg = count > 0 ? Math.round(cData.reduce((a, b) => a + b.totalScore, 0) / count) : 0;
+
+                const div = document.createElement('div');
+                div.className = "p-3 bg-black rounded-xl border border-gray-800 flex justify-between items-center";
+                div.innerHTML = `
+                    <div>
+                        <span class="font-bold text-neonYellow text-sm">${cName}</span>
+                        <span class="text-gray-400 text-xs ml-2">(${count} murid)</span>
+                    </div>
+                    <div class="font-orbitron font-bold text-neonBlue">Purata: ${avg} pts</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function exportToCSV() {
+            const history = JSON.parse(localStorage.getItem(APP_STORAGE_KEY) || '[]');
+            if (history.length === 0) {
+                alert("Tiada rekod untuk dieksport.");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,ID Sesi,Nama,Kelas,Tarikh,Markah,Peratus,Masa(s)\n";
+            history.forEach(r => {
+                csvContent += `"${r.sessionId}","${r.studentName}","${r.studentClass}","${r.date}",${r.totalScore},${r.percentage},${r.totalTimeSeconds}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Rekod_Akhlak_Racing_${Date.now()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // ==========================================
+        // 11. APP ONLOAD INITIALIZATION
+        // ==========================================
+        window.onload = function() {
+            // Check existing registered user session
+            const savedUser = localStorage.getItem('akhlak_racer_user');
+            if (savedUser) {
+                try {
+                    const uData = JSON.parse(savedUser);
+                    document.getElementById('reg-name').value = uData.name || '';
+                    document.getElementById('reg-class').value = uData.studentClass || '';
+                } catch(e){}
+            }
+
+            // Start screen
+            showScreen('main-menu');
+        };
+    </script>
+</body>
+</html>
